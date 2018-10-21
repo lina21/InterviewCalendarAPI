@@ -1,8 +1,5 @@
 package interviewcalendar;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Set;
-import java.util.TreeSet;
+import java.util.*;
 
 /**
  * Interview Calendar is the main class for adding interviewers and candidates,
@@ -12,36 +9,82 @@ import java.util.TreeSet;
  *
  */
 public class InterviewCalendar {	
-	private int nextUniqueID = 0;	
+	private int nextUniqueID = 0;
 	
-	private HashMap<Integer, Person> people = new HashMap<>();
-	
-	// Arrays for remembering which ids correspond to interviewers and which to candidates
-	private Set<Integer> interviewers = new TreeSet<Integer>();
-	private Set<Integer> candidates = new TreeSet<Integer>();
-	
+	// Storing interviewers and candidates in separate collections
+	private HashMap<Integer, Person> interviewers = new HashMap<>();
+	private HashMap<Integer, Person> candidates = new HashMap<>();
+
 	/**
 	 * Add new person
-	 * 
-	 * @param name
+	 *
+	 * @param people collection where the person should be added
+	 * @param name name of the person to be added
 	 * @return generated person's unique id
 	 */
-	private int addPerson(String name) {
+	private int addPerson(HashMap<Integer, Person> people, String name) {
 		Person person = new Person(nextUniqueID, name);
 		people.put(nextUniqueID, person);
 		nextUniqueID++;		
 		return person.getId();
 	}
-	
+
 	/**
 	 * Remove the person
-	 * 
-	 * @param id
+	 *
+	 * @param people collection where the person belongs
+	 * @param id unique id of the person
 	 */
-	private void removePerson(int id) {
+	private void removePerson(HashMap<Integer, Person> people, int id) {
 		if (people.containsKey(id)) people.remove(id);
 	}
-	
+
+	/**
+	 * Get Person by id
+	 *
+	 * @param people collection where the person belongs
+	 * @param id
+	 * @return
+	 */
+	private Person getPerson(HashMap<Integer, Person> people, int id) {
+		return people.get(id);
+	}
+
+	/**
+	 * Get person by his unique id (for both interviewers and candidates)
+	 *
+	 * @param id
+	 * @return
+	 */
+	public Person getPerson(int id) {
+		if (isInterviewer(id)) return interviewers.get(id);
+		else if (isCandidate(id)) return candidates.get(id);
+		else return null;
+	}
+
+	/**
+	 * Check if the person is interviewer
+	 *
+	 * @param id
+	 * @return
+	 */
+	public boolean isInterviewer(int id) {
+		if (interviewers.containsKey(id)) return true;
+		return false;
+	}
+
+	/**
+	 * Check if the person is candidate
+	 *
+	 * @param id
+	 * @return
+	 */
+	public boolean isCandidate(int id) {
+		if (candidates.containsKey(id)) return true;
+		return false;
+	}
+
+
 	/**
 	 * Add new interviewer
 	 * 
@@ -49,38 +92,43 @@ public class InterviewCalendar {
 	 * @return unique id of the person
 	 */
 	public int addInterviewer(String name) {
-		int interviewerID = addPerson(name);
-		interviewers.add(interviewerID);
-		return interviewerID;
+		return addPerson(interviewers, name);
 	}
-	
+
 	/**
 	 * Remove interviewer
 	 * 
 	 * @param id
 	 */
 	public void removeInterviewer(int id) {
-		if (interviewers.contains(id)) {
-			interviewers.remove(id);
-			removePerson(id);
-		}
+		removePerson(interviewers, id);
 	}
 
 	/**
-	 * Get a list of interviewers' ids
-	 * 
+	 * Get interviewer by id
+	 *
+	 * @param id
 	 * @return
 	 */
-	public Set<Integer> getInterviewers() {
+	public Person getInterviewer(int id) {
+		return getPerson(interviewers, id);
+	}
+
+	/**
+	 * Get the collection of interviewers
+	 *
+	 * @return
+	 */
+	public HashMap<Integer, Person> getInterviewers() {
 		return interviewers;
 	}
-	
+
 	/**
-	 * Get a list of candidates' ids
+	 * Get the collection of candidates
 	 * 
 	 * @return
 	 */
-	public Set<Integer> getCandidates() {
+	public HashMap<Integer, Person> getCandidates() {
 		return candidates;
 	}
 	
@@ -91,9 +139,7 @@ public class InterviewCalendar {
 	 * @return unique id of the person
 	 */
 	public int addCandidate(String name) {
-		int candidateID = addPerson(name);
-		candidates.add(candidateID);
-		return candidateID;
+		return addPerson(candidates, name);
 	}
 	
 	/**
@@ -102,10 +148,17 @@ public class InterviewCalendar {
 	 * @param id
 	 */
 	public void removeCandidate(int id) {
-		if (candidates.contains(id)) {
-			candidates.remove(id);
-			removePerson(id);
-		}
+		removePerson(candidates, id);
+	}
+
+	/**
+	 * Get candidate by id
+	 *
+	 * @param id
+	 * @return
+	 */
+	public Person getCandidate(int id) {
+		return getPerson(candidates, id);
 	}
 	
 	/**
@@ -118,7 +171,7 @@ public class InterviewCalendar {
 	 * @param timeslotStartHour starting hour of the timeslot in 24-hour format
 	 */
 	public void addAvailableTimeslot(int personID, int year, int month, int day, int timeslotStartHour) {
-		people.get(personID).addAvailableTimeslot(year, month, day, timeslotStartHour);	
+		getPerson(personID).addAvailableTimeslot(year, month, day, timeslotStartHour);
 	}
 	
 	/**
@@ -132,8 +185,7 @@ public class InterviewCalendar {
 	 * @param timeslotEndHour ending hour of the last available timeslot in 24-hour format
 	 */
 	public void addAvailableTimeslots(int personID, int year, int month, int day, int timeslotStartHour, int timeslotEndHour) {
-		for(int startHour = timeslotStartHour; startHour < timeslotEndHour; startHour++)
-			people.get(personID).addAvailableTimeslot(year, month, day, startHour);	
+	    getPerson(personID).addAvailableTimeslots(year, month, day, timeslotStartHour, timeslotEndHour);
 	}
 	
 	/**
@@ -146,7 +198,7 @@ public class InterviewCalendar {
 	 * @param timeslotStartHour starting hour of the timeslot in 24-hour format
 	 */
 	public void removeUnavailableTimeslot(int personID, int year, int month, int day, int timeslotStartHour) {
-		people.get(personID).removeUnavailableTimeslot(year, month, day, timeslotStartHour);	
+		getPerson(personID).removeUnavailableTimeslot(year, month, day, timeslotStartHour);
 	}
 	
 	/**
@@ -160,8 +212,7 @@ public class InterviewCalendar {
 	 * @param timeslotEndHour ending hour of the last unavailable timeslot in 24-hour format
 	 */
 	public void removeUnavailableTimeslots(int personID, int year, int month, int day, int timeslotStartHour, int timeslotEndHour) {
-		for(int startHour = timeslotStartHour; startHour < timeslotEndHour; startHour++)
-			people.get(personID).removeUnavailableTimeslot(year, month, day, startHour);	
+	    getPerson(personID).removeUnavailableTimeslots(year, month, day, timeslotStartHour, timeslotEndHour);
 	}
 	
 	/**
@@ -179,18 +230,17 @@ public class InterviewCalendar {
 	 * Get all timeslots which are available for the candidate and for all of the interviewers
 	 * 
 	 * @param candidateID
-	 * @param interviewersIDs a list of interviewers' IDs
+	 * @param interviewersIDs a collection of interviewers' IDs
 	 * @return a set of timeslots
 	 */
-	public Set<Timeslot> getTimeslotsIntersection(int candidateID, Set<Integer> interviewersIDs) {
-		Set<Timeslot> possibleSlots = new TreeSet<Timeslot>();
-		possibleSlots.addAll(people.get(candidateID).getAvailableTimeslots());
-
-		for(int interviewerID : interviewersIDs) {
-			possibleSlots.retainAll(people.get(interviewerID).getAvailableTimeslots());
+	public Set<Timeslot> getTimeslotsIntersection(int candidateID, Collection<Integer> interviewersIDs) {
+		List<Person> people = new LinkedList<>();
+		for(Integer interviewerID : interviewersIDs) {
+			Person person = getPerson(interviewerID);
+			if (person != null) people.add(person);
 		}
-		
-		return possibleSlots;
+
+		return getPerson(candidateID).getTimeslotsIntersection(people);
 	}
 
 }

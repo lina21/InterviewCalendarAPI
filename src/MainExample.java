@@ -6,6 +6,7 @@ import java.util.Set;
 
 import interviewcalendar.InterviewCalendar;
 import interviewcalendar.Timeslot;
+import interviewcalendar.Person;
 
 /**
  * Demonstration of Interview Calendar API usage
@@ -17,40 +18,45 @@ public class MainExample {
 
 	public static void main(String[] args) {
 		InterviewCalendar interviewCalendar = new InterviewCalendar();
+
 		// Add a candidate
-		int candidateID = interviewCalendar.addCandidate("Johanna");
-		System.out.println("Candidate Johanna available for interview:");
+		Person candidateJohanna = interviewCalendar.getCandidate(interviewCalendar.addCandidate("Johanna"));
+		System.out.println("Candidate " + candidateJohanna.getName() + " available for interview:");
+
 		// Available for interview from 9am to 10am any weekday next week
 		for (int day = 22; day < 27; day++)
-			interviewCalendar.addAvailableTimeslots(candidateID, 2018, 10, day, 9, 10);
+			candidateJohanna.addAvailableTimeslots(2018, 10, day, 9, 10);
 		System.out.println("- from 9am to 10am any weekday next week");
+
 		// ...and from 10am to 12pm on Wednesday
-		interviewCalendar.addAvailableTimeslots(candidateID, 2018, 10, 24, 10, 12);
+		candidateJohanna.addAvailableTimeslots(2018, 10, 24, 10, 12);
 		System.out.println("- from 10am to 12pm on Wednesday\n");
 		
 		// Add interviewer Philipp
-		int interviewer1ID = interviewCalendar.addInterviewer("Philipp");
-		System.out.println("Interviewer Philipp available:");
+		Person interviewerPhilipp = interviewCalendar.getInterviewer(interviewCalendar.addInterviewer("Philipp"));
+		System.out.println("Interviewer " + interviewerPhilipp.getName() + " available:");
+
 		// Available next week each day from 9am through 4pm without breaks
 		for (int day = 22; day < 27; day++)
-			interviewCalendar.addAvailableTimeslots(interviewer1ID, 2018, 10, day, 9, 16);
+			interviewerPhilipp.addAvailableTimeslots(2018, 10, day, 9, 16);
 		System.out.println("- next week each day from 9am through 4pm without breaks\n");
 		
 		// Add interviewer Sarah
-		int interviewer2ID = interviewCalendar.addInterviewer("Sarah");
-		System.out.println("Interviewer Sarah available:");
+		Person interviewerSarah = interviewCalendar.getInterviewer(interviewCalendar.addInterviewer("Sarah"));
+		System.out.println("Interviewer " + interviewerSarah.getName() + " available:");
+
 		// Available from 12pm to 6pm on Monday and Wednesday
-		interviewCalendar.addAvailableTimeslots(interviewer2ID, 2018, 10, 22, 12, 18);
-		interviewCalendar.addAvailableTimeslots(interviewer2ID, 2018, 10, 24, 12, 18);
+		interviewerSarah.addAvailableTimeslots(2018, 10, 22, 12, 18);
+		interviewerSarah.addAvailableTimeslots(2018, 10, 24, 12, 18);
 		System.out.println("- from 12pm to 6pm on Monday and Wednesday");
 		// ...and from 9am to 12pm on Tuesday and Thursday
-		interviewCalendar.addAvailableTimeslots(interviewer2ID, 2018, 10, 23, 9, 12);
-		interviewCalendar.addAvailableTimeslots(interviewer2ID, 2018, 10, 25, 9, 12);
+		interviewerSarah.addAvailableTimeslots(2018, 10, 23, 9, 12);
+		interviewerSarah.addAvailableTimeslots(2018, 10, 25, 9, 12);
 		System.out.println("- from 9am to 12pm on Tuesday and Thursday\n");
 
 		
 		// Get collection of possible 1-hour timeslots for the interview
-		Set<Timeslot> timeslots = interviewCalendar.getTimeslotsIntersection(candidateID, interviewCalendar.getInterviewers());
+		Set<Timeslot> timeslots = candidateJohanna.getTimeslotsIntersection(interviewCalendar.getInterviewers().values());
 		System.out.println("Found the following possible timeslots for an interview:");
 		
 		// Print the collection to the console in a specific format
